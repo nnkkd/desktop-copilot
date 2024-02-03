@@ -6,7 +6,7 @@ const Config = () => {
   const config = useContext(ConfigContext);
   return (
     <>
-      <div className="absolute top-0 right-0 mx-1 my-1">
+      <div className="z-10 absolute top-0 right-0 mx-1 my-1">
         <button
           onClick={() => setIsConfigOpen((prev) => !prev)}
           className="border-primary font-bold py-2 px-4 border bg-white"
@@ -15,7 +15,7 @@ const Config = () => {
         </button>
       </div>
       {isConfigOpen && (
-        <div className="mt-16 absolute border border-primary top-0 right-0 mx-1 px-1 py-1 bg-white">
+        <div className="z-10 mt-16 absolute border border-primary top-0 right-0 mx-1 px-1 py-1 bg-white">
           <div className="mb-4">
             OpenAI API Key:
             <input
