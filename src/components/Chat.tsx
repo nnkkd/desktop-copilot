@@ -95,7 +95,10 @@ const Chat = (props: Props) => {
         {props.messages.length === 0 ? (
           <InitialScreen />
         ) : (
-          <MessageList messages={props.messages} />
+          <MessageList
+            messages={props.messages}
+            openAiClient={props.openAiClient}
+          />
         )}
       </div>
       <InputBox
