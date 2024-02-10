@@ -8,33 +8,42 @@ type Props = {
 };
 
 const MessageList = (props: Props) => {
-  const reversedMessages = props.messages.slice().reverse();
   const [images, setImages] = useState<{ [key: string]: string }>({});
   const [isImageFetching, setIsImageFetching] = useState<boolean>(false);
-  const fetchImageFiles = async () => {
-    setIsImageFetching(true);
-    const imageInfos: { [key: string]: string } = {};
-    for (const message of props.messages) {
-      for (const content of message.content) {
-        console.log(content.type === "image_file" && props.openAiClient);
-        if (content.type === "image_file" && props.openAiClient) {
-          const file = await props.openAiClient.files.content(
-            content.image_file.file_id
-          );
-          const blob = await file.blob();
-          const url = URL.createObjectURL(blob);
-          imageInfos[content.image_file.file_id] = url;
-        }
-      }
-    }
-    setImages(imageInfos);
-    setIsImageFetching(false);
-  };
 
   useEffect(() => {
+    const fetchImageFiles = async () => {
+      if (!props.openAiClient) return;
+      setIsImageFetching(true);
+      const newImages = { ...images };
+      let isUpdated = false;
+
+      for (const message of props.messages) {
+        for (const content of message.content) {
+          if (
+            content.type === "image_file" &&
+            !(content.image_file.file_id in newImages)
+          ) {
+            const file = await props.openAiClient.files.content(
+              content.image_file.file_id
+            );
+            const blob = await file.blob();
+            const url = URL.createObjectURL(blob);
+            newImages[content.image_file.file_id] = url;
+            isUpdated = true;
+          }
+        }
+      }
+
+      if (isUpdated) {
+        setImages(newImages);
+      }
+      setIsImageFetching(false);
+    };
+
     fetchImageFiles();
   }, [props.messages, props.openAiClient]);
-  console.log(images);
+  const reversedMessages = props.messages.slice().reverse();
 
   return !isImageFetching ? (
     <div className="mx-8 mt-12">
