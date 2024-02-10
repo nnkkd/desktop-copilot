@@ -30,7 +30,7 @@ const Recent = (props: Props) => {
   return (
     <div className="w-64">
       <div className="font-bold text-center pb-4 border-b-primary border-b mb-8">
-        最近のアクティビティ
+        Recent activity
       </div>
       {threads.map((threadId, index) => {
         return (

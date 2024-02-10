@@ -5,9 +5,9 @@ const InitialScreen = () => {
         Desktop Copilot
       </div>
       <div className="text-center text-2xl mt-4">
-        UbuntuにもCopilotがほしい！
+        Your AI companion for the desktop
       </div>
-      <div className="text-center mt-4">OpenAI APIを使用</div>
+      <div className="text-center mt-4">OpenAI API key is required.</div>
     </>
   );
 };
