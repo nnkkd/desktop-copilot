@@ -1,42 +1,44 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ConfigContext } from "../context/ConfigContext";
+import OpenAI from "openai";
+import { Assistant } from "openai/resources/beta/index.mjs";
 
-const Config = () => {
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+type Props = {
+  openAiClient: OpenAI | null;
+};
+
+const Config = (props: Props) => {
   const config = useContext(ConfigContext);
+  const [assistants, setAssistants] = useState<Assistant[]>([]);
+  useEffect(() => {
+    if (props.openAiClient) {
+      props.openAiClient.beta.assistants.list().then((agents) => {
+        setAssistants(agents.data);
+      });
+    }
+  }, [config.apiKey, props.openAiClient]);
   return (
     <>
-      <div className="z-10 absolute top-0 right-0 mx-1 my-1">
-        <button
-          onClick={() => setIsConfigOpen((prev) => !prev)}
-          className="border-primary font-bold py-2 px-4 border bg-white"
-        >
-          Open Config
-        </button>
-      </div>
-      {isConfigOpen && (
-        <div className="z-10 mt-16 absolute border border-primary top-0 right-0 mx-1 px-1 py-1 bg-white">
-          <div className="mb-4">
-            OpenAI API Key:
-            <input
-              className="block border-gray-300 border p-2 ml-auto"
-              placeholder="sk-..."
-              type="password"
-              value={config.apiKey}
-              onChange={(e) => config.setApiKey(e.target.value)}
-            ></input>
-          </div>
-          <div className="mb-4">
-            Assistant ID:
-            <input
-              className="block border-gray-300 border p-2 ml-auto"
-              placeholder="asst_..."
-              value={config.assistantId}
-              onChange={(e) => config.setAssistantId(e.target.value)}
-            ></input>
-          </div>
-        </div>
-      )}
+      <input
+        className="block border-gray-300 border p-2 ml-auto mb-2 w-full"
+        placeholder="sk-..."
+        type="password"
+        value={config.apiKey}
+        onChange={(e) => config.setApiKey(e.target.value)}
+      ></input>
+      <select
+        className="block border-gray-300 border p-2 mr-auto w-full"
+        value={config.assistantId}
+        onChange={(e) => config.setAssistantId(e.target.value)}
+      >
+        {assistants.map((assistant) => {
+          return (
+            <option key={assistant.id} value={assistant.id}>
+              {assistant.name}
+            </option>
+          );
+        })}
+      </select>
     </>
   );
 };

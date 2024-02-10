@@ -5,13 +5,13 @@ import useLocalStorage from "../hooks/useLocalStrage";
 import { ThreadMessage } from "openai/resources/beta/threads/index.mjs";
 import OpenAI from "openai";
 import { ConfigContext } from "../context/ConfigContext";
+import Config from "./Config";
 
 const Home = () => {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [recentActivity, setRecentActivity] = useLocalStorage<Array<string>>(
-    "recent",
-    []
-  );
+  const [recentActivity, setRecentActivity] = useLocalStorage<
+    Array<RecentActivity>
+  >("recent", []);
   const [messages, setMessages] = useState<Array<ThreadMessage>>([]);
   const [openAiClient, setOpenAiClient] = useState<OpenAI | null>(null);
   const config = useContext(ConfigContext);
@@ -24,11 +24,10 @@ const Home = () => {
       });
       setOpenAiClient(client);
     }
-  }, [config.apiKey, config.assistantId]);
-
+  }, [config.apiKey]);
   return (
     <div className="flex">
-      <div className="flex-1">
+      <div className="flex-1 max-h-screen">
         <Chat
           selectedThreadId={selectedThreadId}
           setSelectedThreadId={setSelectedThreadId}
@@ -39,7 +38,10 @@ const Home = () => {
         />
       </div>
       <div className="flex justify-end">
-        <div className="md:block hidden mt-16">
+        <div className="md:block hidden mt-2">
+          <div className="mx-2 mb-6">
+            <Config openAiClient={openAiClient} />
+          </div>
           <Recent
             selectedThreadId={selectedThreadId}
             setSelectedThreadId={setSelectedThreadId}

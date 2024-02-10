@@ -10,7 +10,7 @@ type Props = {
   selectedThreadId: string | null;
   setSelectedThreadId: Dispatch<React.SetStateAction<string | null>>;
   setRecentActivity: (
-    callbackFn: (activities: Array<string>) => Array<string>
+    callbackFn: (activities: Array<RecentActivity>) => Array<RecentActivity>
   ) => void;
   messages: Array<ThreadMessage>;
   setMessages: Dispatch<React.SetStateAction<Array<ThreadMessage>>>;
@@ -32,7 +32,24 @@ const Chat = (props: Props) => {
         });
         props.setSelectedThreadId(response.id);
         props.setRecentActivity((prev) => {
-          return [response.id, ...prev];
+          const assistantIndex = prev.find(
+            (activity) => activity.assistantId === config.assistantId
+          );
+          if (assistantIndex) {
+            const newThreads = assistantIndex.threads.concat(response.id);
+            const newActivity = prev.map((activity) => {
+              if (activity.assistantId === config.assistantId) {
+                return { ...activity, threads: newThreads };
+              }
+              return activity;
+            });
+            return newActivity;
+          } else {
+            return prev.concat({
+              assistantId: config.assistantId,
+              threads: [response.id],
+            });
+          }
         });
         threadId = response.id;
       } else {
@@ -73,21 +90,21 @@ const Chat = (props: Props) => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {props.messages.length === 0 ? (
-        <InitialScreen />
-      ) : (
-        <MessageList messages={props.messages} />
-      )}{" "}
-      <div className="absolute bottom-0 w-full">
-        <InputBox
-          serUserInput={setUserInput}
-          userInput={userInput}
-          handleSendMessage={handleSendMessage}
-          setSelectedThreadId={props.setSelectedThreadId}
-          setMessages={props.setMessages}
-        />
+    <div className="flex flex-col h-screen">
+      <div className="flex-1 overflow-y-scroll">
+        {props.messages.length === 0 ? (
+          <InitialScreen />
+        ) : (
+          <MessageList messages={props.messages} />
+        )}
       </div>
+      <InputBox
+        setUserInput={setUserInput}
+        userInput={userInput}
+        handleSendMessage={handleSendMessage}
+        setSelectedThreadId={props.setSelectedThreadId}
+        setMessages={props.setMessages}
+      />
     </div>
   );
 };
