@@ -9,9 +9,7 @@ import MessageList from "./MessageList";
 type Props = {
   selectedThreadId: string | null;
   setSelectedThreadId: Dispatch<React.SetStateAction<string | null>>;
-  setRecentActivity: (
-    callbackFn: (activities: Array<RecentActivity>) => Array<RecentActivity>
-  ) => void;
+  addRecentThreads: (value: RecentThread) => Promise<void>;
   messages: Array<ThreadMessage>;
   setMessages: Dispatch<React.SetStateAction<Array<ThreadMessage>>>;
   openAiClient: OpenAI | null;
@@ -31,26 +29,11 @@ const Chat = (props: Props) => {
           messages: [{ role: "user", content: userInput }],
         });
         props.setSelectedThreadId(response.id);
-        props.setRecentActivity((prev) => {
-          const assistantIndex = prev.find(
-            (activity) => activity.assistantId === config.assistantId
-          );
-          if (assistantIndex) {
-            const newThreads = assistantIndex.threads.concat(response.id);
-            const newActivity = prev.map((activity) => {
-              if (activity.assistantId === config.assistantId) {
-                return { ...activity, threads: newThreads };
-              }
-              return activity;
-            });
-            return newActivity;
-          } else {
-            return prev.concat({
-              assistantId: config.assistantId,
-              threads: [response.id],
-            });
-          }
+        await props.addRecentThreads({
+          threadId: response.id,
+          name: "New Thread",
         });
+
         threadId = response.id;
       } else {
         // Add a message to the existing thread

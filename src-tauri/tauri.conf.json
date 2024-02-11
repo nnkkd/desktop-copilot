@@ -18,6 +18,13 @@
       },
       "globalShortcut": {
         "all": true
+      },
+      "fs": {
+        "writeFile": true
+      },
+      "dialog": {
+        "all": false,
+        "save": true
       }
     },
     "bundle": {

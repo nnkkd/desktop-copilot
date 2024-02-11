@@ -1,5 +1,5 @@
 import React from "react";
-import useLocalStorage from "../hooks/useLocalStrage";
+import useLocalStorage from "../hooks/useLocalStroage";
 
 export const ConfigContext = React.createContext({
   apiKey: "",

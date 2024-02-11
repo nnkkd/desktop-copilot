@@ -1,15 +1,38 @@
 import OpenAI from "openai";
 import { ThreadMessage } from "openai/resources/beta/threads/index.mjs";
 import { useEffect, useState } from "react";
+import { save } from "@tauri-apps/api/dialog";
+import { fs } from "@tauri-apps/api";
 
 type Props = {
   messages: Array<ThreadMessage>;
   openAiClient: OpenAI | null;
 };
 
+type ImageContentMap = {
+  [key: string]: {
+    url: string;
+    blob: Blob;
+    id: string;
+  };
+};
+
 const MessageList = (props: Props) => {
-  const [images, setImages] = useState<{ [key: string]: string }>({});
+  const [images, setImages] = useState<ImageContentMap>({});
   const [isImageFetching, setIsImageFetching] = useState<boolean>(false);
+
+  const handleSaveImage = async (blob: Blob) => {
+    const path = await save({
+      defaultPath: "image.png",
+    });
+    if (path) {
+      fs.writeBinaryFile(path, new Uint8Array(await blob.arrayBuffer())).then(
+        () => {
+          console.log("File saved");
+        }
+      );
+    }
+  };
 
   useEffect(() => {
     const fetchImageFiles = async () => {
@@ -29,7 +52,11 @@ const MessageList = (props: Props) => {
             );
             const blob = await file.blob();
             const url = URL.createObjectURL(blob);
-            newImages[content.image_file.file_id] = url;
+            newImages[content.image_file.file_id] = {
+              id: content.image_file.file_id,
+              url,
+              blob,
+            };
             isUpdated = true;
           }
         }
@@ -58,9 +85,17 @@ const MessageList = (props: Props) => {
                 </div>
               );
             } else if (content.type === "image_file") {
-              const imageUrl = images[content.image_file.file_id];
-              return imageUrl ? (
-                <img key={contentIndex} src={imageUrl} alt="" />
+              const image = images[content.image_file.file_id];
+              return image ? (
+                <img
+                  width={400}
+                  height={400}
+                  className="object-contain h-2/5"
+                  key={contentIndex}
+                  src={image.url}
+                  alt=""
+                  onClick={() => handleSaveImage(image.blob)}
+                />
               ) : null;
             }
           })}
