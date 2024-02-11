@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 const dbName = "desktop-copilot"; // データベース名
-const dbVersion = 2; // データベースのバージョン
+const dbVersion = 1; // データベースのバージョン
 // IndexedDBデータベースを開くための関数
 const openDB = async (storeName: string): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
