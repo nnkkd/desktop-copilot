@@ -18,7 +18,7 @@ const InputBox = (props: Props) => {
     <div className="flex items-center">
       <div className="flex items-center h-12">
         <button
-          className="m-2 p-2 border border-primary h-full"
+          className="m-2 p-2 border border-primary h-full hover:bg-gray-100"
           onClick={handleNewThread}
         >
           new thread
@@ -31,7 +31,7 @@ const InputBox = (props: Props) => {
           onChange={(e) => props.setUserInput(e.target.value)}
         />
         <button
-          className="h-12 flex-none border border-primary px-4 ml-2"
+          className="h-12 flex-none border border-primary px-4 ml-2 hover:bg-gray-100"
           onClick={props.handleSendMessage}
         >
           send

@@ -24,7 +24,6 @@ const Chat = (props: Props) => {
     if (props.openAiClient && userInput.length > 0) {
       const openAiClient = props.openAiClient;
       if (props.selectedThreadId === null) {
-        // Create a new thread
         const response = await openAiClient.beta.threads.create({
           messages: [{ role: "user", content: userInput }],
         });
@@ -36,7 +35,6 @@ const Chat = (props: Props) => {
 
         threadId = response.id;
       } else {
-        // Add a message to the existing thread
         await openAiClient.beta.threads.messages.create(
           props.selectedThreadId,
           {

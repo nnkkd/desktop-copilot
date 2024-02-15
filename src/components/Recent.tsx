@@ -29,7 +29,7 @@ const Recent = (props: Props) => {
         return (
           <div
             key={index}
-            className="truncate text-center p-4 border-primary border cursor-pointer mx-2 my-2"
+            className="truncate text-center p-4 border-primary border cursor-pointer mx-2 my-2 hover:bg-gray-100"
             onClick={() => handleChangeThread(thread.threadId)}
           >
             {thread.name}

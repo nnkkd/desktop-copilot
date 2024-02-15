@@ -20,6 +20,32 @@ type ImageContentMap = {
 const MessageList = (props: Props) => {
   const [images, setImages] = useState<ImageContentMap>({});
   const [isImageFetching, setIsImageFetching] = useState<boolean>(false);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    blob: Blob | null;
+  }>({ x: 0, y: 0, blob: null });
+
+  const handleContextMenu = (
+    event: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    blob: Blob
+  ) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      blob,
+    });
+  };
+
+  const handleClick = () => {
+    setContextMenu({ ...contextMenu, blob: null });
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
 
   const handleSaveImage = async (blob: Blob) => {
     const path = await save({
@@ -94,13 +120,28 @@ const MessageList = (props: Props) => {
                   key={contentIndex}
                   src={image.url}
                   alt=""
-                  onClick={() => handleSaveImage(image.blob)}
+                  onContextMenu={(e) => handleContextMenu(e, image.blob)}
                 />
               ) : null;
             }
           })}
         </div>
       ))}
+      {contextMenu.blob && (
+        <ul
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          className="absolute bg-white border border-gray-200 shadow-lg"
+        >
+          <li
+            className="cursor-pointer hover:bg-gray-100 p-2"
+            onClick={() =>
+              contextMenu.blob && handleSaveImage(contextMenu.blob)
+            }
+          >
+            Save Image
+          </li>
+        </ul>
+      )}
     </div>
   ) : null;
 };
